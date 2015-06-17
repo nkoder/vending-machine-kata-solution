@@ -1,6 +1,6 @@
-bin
-obj
+# IntelliJ IDEA project files
 .idea
 *.iml
-*.eml
-target
+
+# Java build files
+target/
