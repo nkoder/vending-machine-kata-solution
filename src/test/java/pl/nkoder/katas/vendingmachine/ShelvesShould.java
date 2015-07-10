@@ -15,7 +15,7 @@ public class ShelvesShould {
         shelves.putProduct(cola, 1, price("0.1"));
         shelves.putProduct(mars, 2, price("999.9"));
 
-        assertThat(shelves.priceOfProductAtShelf(2)).isEqualTo(price("999.9"));
-        assertThat(shelves.priceOfProductAtShelf(1)).isEqualTo(price("0.1"));
+        assertThat(shelves.priceOfProductAtShelf(2).asText()).isEqualTo("999.9");
+        assertThat(shelves.priceOfProductAtShelf(1).asText()).isEqualTo("0.1");
     }
 }

@@ -3,18 +3,28 @@ package pl.nkoder.katas.vendingmachine;
 public class VendingMachine {
 
     private final Shelves shelves;
-    private String message;
+    private final Display display;
 
     public VendingMachine(Shelves shelves) {
         this.shelves = shelves;
-        message = "Choose a product";
+        this.display = new Display();
+        display.promptForProductChoice();
     }
 
     public String displayedMessage() {
-        return message;
+        return display.message();
     }
 
     public void choose(int shelfNumber) {
-        message = "Insert " + shelves.priceOfProductAtShelf(shelfNumber).asText();
+        Price price = priceOfProductAtShelf(shelfNumber);
+        display.promptForMoneyToInsert(price);
+    }
+
+    public void cancel() {
+        display.promptForProductChoice();
+    }
+
+    private Price priceOfProductAtShelf(int shelfNumber) {
+        return shelves.priceOfProductAtShelf(shelfNumber);
     }
 }
