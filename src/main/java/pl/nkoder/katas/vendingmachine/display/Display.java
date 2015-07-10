@@ -1,4 +1,6 @@
-package pl.nkoder.katas.vendingmachine;
+package pl.nkoder.katas.vendingmachine.display;
+
+import pl.nkoder.katas.vendingmachine.money.Cost;
 
 import static java.lang.String.format;
 
@@ -14,7 +16,7 @@ public class Display {
         message = "Choose a product";
     }
 
-    public void promptForMoneyToInsert(Price price) {
-        message = format("Insert %s", price.asText());
+    public void promptForMoneyToInsert(Cost cost) {
+        message = format("Insert %s", cost.asText());
     }
 }

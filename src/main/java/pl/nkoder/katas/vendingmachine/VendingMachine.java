@@ -1,13 +1,23 @@
 package pl.nkoder.katas.vendingmachine;
 
+import pl.nkoder.katas.vendingmachine.display.Display;
+import pl.nkoder.katas.vendingmachine.money.Coin;
+import pl.nkoder.katas.vendingmachine.money.Coins;
+import pl.nkoder.katas.vendingmachine.money.Cost;
+import pl.nkoder.katas.vendingmachine.shelves.Shelves;
+
+import java.util.Optional;
+
 public class VendingMachine {
 
     private final Shelves shelves;
-    private final Display display;
+    private final Display display = new Display();
+    private final Coins coins = new Coins();
+
+    private Optional<Integer> chosenShelfNumber = Optional.empty();
 
     public VendingMachine(Shelves shelves) {
         this.shelves = shelves;
-        this.display = new Display();
         display.promptForProductChoice();
     }
 
@@ -16,15 +26,31 @@ public class VendingMachine {
     }
 
     public void choose(int shelfNumber) {
-        Price price = priceOfProductAtShelf(shelfNumber);
-        display.promptForMoneyToInsert(price);
+        chosenShelfNumber = Optional.of(shelfNumber);
+        updateDisplay();
+    }
+
+    public void insert(Coin coin) {
+        coins.add(coin);
+        updateDisplay();
     }
 
     public void cancel() {
-        display.promptForProductChoice();
+        chosenShelfNumber = Optional.empty();
+        updateDisplay();
     }
 
-    private Price priceOfProductAtShelf(int shelfNumber) {
+    private void updateDisplay() {
+        if (chosenShelfNumber.isPresent()) {
+            Cost productPrice = priceOfProductAtShelf(chosenShelfNumber.get());
+            Cost remainingCost = productPrice.subtract(coins.value());
+            display.promptForMoneyToInsert(remainingCost);
+        } else {
+            display.promptForProductChoice();
+        }
+    }
+
+    private Cost priceOfProductAtShelf(int shelfNumber) {
         return shelves.priceOfProductAtShelf(shelfNumber);
     }
 }

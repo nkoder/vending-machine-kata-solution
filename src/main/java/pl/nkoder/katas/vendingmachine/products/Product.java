@@ -1,4 +1,4 @@
-package pl.nkoder.katas.vendingmachine;
+package pl.nkoder.katas.vendingmachine.products;
 
 public class Product {
 
