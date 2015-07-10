@@ -2,11 +2,11 @@ package pl.nkoder.katas.vendingmachine;
 
 public class VendingMachine {
 
-    private final Prices prices;
+    private final Shelves shelves;
     private String message;
 
-    public VendingMachine(Prices prices) {
-        this.prices = prices;
+    public VendingMachine(Shelves shelves) {
+        this.shelves = shelves;
         message = "Choose a product";
     }
 
@@ -14,7 +14,7 @@ public class VendingMachine {
         return message;
     }
 
-    public void choose(Product product) {
-        message = "Insert " + prices.priceOf(product).asText();
+    public void choose(int shelfNumber) {
+        message = "Insert " + shelves.priceOfProductAtShelf(shelfNumber).asText();
     }
 }
