@@ -18,4 +18,8 @@ public class Shelves {
     public Cost priceOfProductAtShelf(int shelfNumber) {
         return shelvesByNumbers.get(shelfNumber).price;
     }
+
+    public Product productAtShelf(int shelfNumber) {
+        return shelvesByNumbers.get(shelfNumber).product;
+    }
 }

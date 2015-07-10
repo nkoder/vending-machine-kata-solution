@@ -22,6 +22,10 @@ public class Cost {
         return new Cost(value.subtract(anotherCost.value));
     }
 
+    public boolean isEqualTo(Cost anotherCost) {
+        return value.equals(anotherCost.value);
+    }
+
     public String asText() {
         return value.toString();
     }

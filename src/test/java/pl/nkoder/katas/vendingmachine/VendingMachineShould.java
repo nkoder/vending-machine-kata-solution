@@ -1,12 +1,11 @@
 package pl.nkoder.katas.vendingmachine;
 
 import org.junit.Test;
-import pl.nkoder.katas.vendingmachine.money.Coin;
 import pl.nkoder.katas.vendingmachine.shelves.Shelves;
 
-import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +28,8 @@ public class VendingMachineShould {
         VendingMachine machine = new VendingMachine(new Shelves());
 
         assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.takeOutTray()).isEmpty();
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     @Test
@@ -41,6 +42,8 @@ public class VendingMachineShould {
         machine.choose(FIRST_SHELF);
 
         assertThat(machine.displayedMessage()).isEqualTo("Insert 3.5");
+        assertThat(machine.takeOutTray()).isEmpty();
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     @Test
@@ -49,11 +52,14 @@ public class VendingMachineShould {
 
         Shelves shelves = new Shelves().putProduct(COLA, FIRST_SHELF, costOf("3.5"));
         VendingMachine machine = new VendingMachine(shelves);
+
         machine.choose(FIRST_SHELF);
 
         machine.cancel();
 
         assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.takeOutTray()).isEmpty();
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     @Test
@@ -64,12 +70,15 @@ public class VendingMachineShould {
             .putProduct(COLA, FIRST_SHELF, costOf("3.5"))
             .putProduct(MARS, SECOND_SHELF, costOf("1.0"));
         VendingMachine machine = new VendingMachine(shelves);
+
         machine.choose(FIRST_SHELF);
         machine.cancel();
 
         machine.choose(SECOND_SHELF);
 
         assertThat(machine.displayedMessage()).isEqualTo("Insert 1.0");
+        assertThat(machine.takeOutTray()).isEmpty();
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     @Test
@@ -78,12 +87,15 @@ public class VendingMachineShould {
 
         Shelves shelves = new Shelves().putProduct(COLA, FIRST_SHELF, costOf("3.5"));
         VendingMachine machine = new VendingMachine(shelves);
+
         machine.choose(FIRST_SHELF);
 
         machine.insert(COIN_2_0);
         machine.insert(COIN_0_5);
 
         assertThat(machine.displayedMessage()).isEqualTo("Insert 1.0");
+        assertThat(machine.takeOutTray()).isEmpty();
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     @Test
@@ -92,7 +104,9 @@ public class VendingMachineShould {
 
         Shelves shelves = new Shelves().putProduct(COLA, FIRST_SHELF, costOf("3.5"));
         VendingMachine machine = new VendingMachine(shelves);
+
         machine.choose(FIRST_SHELF);
+
         machine.insert(COIN_0_5);
         machine.insert(COIN_0_5);
         machine.insert(COIN_1_0);
@@ -100,14 +114,16 @@ public class VendingMachineShould {
 
         machine.cancel();
 
+        assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.takeOutTray()).isEmpty();
         assertThat(asMap(machine.returnedCoins()))
             .hasSize(2)
             .containsEntry(COIN_0_5, 3L)
             .containsEntry(COIN_1_0, 1L);
     }
 
-    private Map<Coin, Long> asMap(List<Coin> coins) {
-        return coins
+    private <T> Map<T, Long> asMap(Iterable<T> coins) {
+        return newArrayList(coins)
             .stream()
             .collect(groupingBy(coin -> coin, counting()));
     }
