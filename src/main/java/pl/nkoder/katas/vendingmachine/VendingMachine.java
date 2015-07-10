@@ -6,6 +6,7 @@ import pl.nkoder.katas.vendingmachine.money.Coins;
 import pl.nkoder.katas.vendingmachine.money.Cost;
 import pl.nkoder.katas.vendingmachine.shelves.Shelves;
 
+import java.util.List;
 import java.util.Optional;
 
 public class VendingMachine {
@@ -52,5 +53,9 @@ public class VendingMachine {
 
     private Cost priceOfProductAtShelf(int shelfNumber) {
         return shelves.priceOfProductAtShelf(shelfNumber);
+    }
+
+    public List<Coin> returnedCoins() {
+        return coins.asList();
     }
 }
