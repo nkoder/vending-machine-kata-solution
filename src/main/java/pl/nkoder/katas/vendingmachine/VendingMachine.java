@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public class VendingMachine {
 
+    private static final Duration DURATION_OF_WARNING_MESSAGE = Duration.ofSeconds(3);
+
     private final Shelves shelves;
     private final DelayedActions delayedActions;
     private final Display display = new Display();
@@ -80,9 +82,9 @@ public class VendingMachine {
             if (lastTryWasSuccessful) {
                 display.promptForProductChoice();
             } else {
-                display.informAboutNoChangeAndPromptForProductChoice();
+                display.warnAboutNoChange();
                 delayedActions
-                    .after(Duration.ofSeconds(3))
+                    .after(DURATION_OF_WARNING_MESSAGE)
                     .perform(() -> display.promptForProductChoice());
             }
         } else {

@@ -5,12 +5,7 @@ import org.junit.Test;
 import pl.nkoder.katas.vendingmachine.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.time.DelayedActionsForTests;
 
-import java.util.Map;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static org.assertj.core.api.Assertions.assertThat;
+import static pl.nkoder.katas.vendingmachine.VendingMachineAssertions.assertThat;
 import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_0_5;
 import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_1_0;
 import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_2_0;
@@ -37,9 +32,10 @@ public class VendingMachineShould {
 
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasNoProductInTakeOutTray()
+            .returnedNoCoins();
     }
 
     @Test
@@ -51,9 +47,10 @@ public class VendingMachineShould {
 
         machine.choose(FIRST_SHELF);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wrzuć 3.5");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wrzuć 3.5")
+            .hasNoProductInTakeOutTray()
+            .returnedNoCoins();
     }
 
     @Test
@@ -67,9 +64,10 @@ public class VendingMachineShould {
 
         machine.cancel();
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasNoProductInTakeOutTray()
+            .returnedNoCoins();
     }
 
     @Test
@@ -78,7 +76,7 @@ public class VendingMachineShould {
 
         shelves
             .putProduct(COLA, FIRST_SHELF, costOf("3.5"))
-            .putProduct(MARS, SECOND_SHELF, costOf("1.0"));
+            .putProduct(MARS, SECOND_SHELF, costOf("2.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
@@ -86,9 +84,10 @@ public class VendingMachineShould {
 
         machine.choose(SECOND_SHELF);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wrzuć 1.0");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wrzuć 2.0")
+            .hasNoProductInTakeOutTray()
+            .returnedNoCoins();
     }
 
     @Test
@@ -103,9 +102,10 @@ public class VendingMachineShould {
         machine.insert(COIN_2_0);
         machine.insert(COIN_0_5);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wrzuć 1.0");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wrzuć 1.0")
+            .hasNoProductInTakeOutTray()
+            .returnedNoCoins();
     }
 
     @Test
@@ -124,12 +124,10 @@ public class VendingMachineShould {
 
         machine.cancel();
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(asMap(machine.returnedCoins()))
-            .hasSize(2)
-            .containsEntry(COIN_0_5, 3L)
-            .containsEntry(COIN_1_0, 1L);
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasNoProductInTakeOutTray()
+            .returnedCoins(COIN_0_5, COIN_0_5, COIN_0_5, COIN_1_0);
     }
 
     @Test
@@ -145,9 +143,10 @@ public class VendingMachineShould {
         machine.insert(COIN_1_0);
         machine.insert(COIN_0_5);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-        assertThat(asMap(machine.takeOutTray())).hasSize(1).containsEntry(COLA, 1L);
-        assertThat(machine.returnedCoins()).isEmpty();
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasInTakeAwayTray(COLA)
+            .returnedNoCoins();
     }
 
     @Test
@@ -164,9 +163,10 @@ public class VendingMachineShould {
         machine.insert(COIN_0_5);
         machine.insert(COIN_1_0);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-        assertThat(asMap(machine.takeOutTray())).hasSize(1).containsEntry(COLA, 1L);
-        assertThat(asMap(machine.returnedCoins())).hasSize(1).containsEntry(COIN_0_5, 1L);
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasInTakeAwayTray(COLA)
+            .returnedCoins(COIN_0_5);
     }
 
     @Test
@@ -182,22 +182,14 @@ public class VendingMachineShould {
         machine.insert(COIN_1_0);
         machine.insert(COIN_1_0);
 
-        assertThat(machine.displayedMessage()).isEqualTo("Nie mogę wydać reszty. Zakup anulowany.");
-        assertThat(machine.takeOutTray()).isEmpty();
-        assertThat(asMap(machine.returnedCoins()))
-            .hasSize(2)
-            .containsEntry(COIN_2_0, 1L)
-            .containsEntry(COIN_1_0, 2L);
+        assertThat(machine)
+            .displaysMessage("Nie mogę wydać reszty. Zakup anulowany.")
+            .hasNoProductInTakeOutTray()
+            .returnedCoins(COIN_1_0, COIN_1_0, COIN_2_0);
 
         delayedActions.performAll();
 
-        assertThat(machine.displayedMessage()).isEqualTo("Wybierz produkt");
-    }
-
-    private <T> Map<T, Long> asMap(Iterable<T> coins) {
-        return newArrayList(coins)
-            .stream()
-            .collect(groupingBy(coin -> coin, counting()));
+        assertThat(machine).displaysMessage("Wybierz produkt");
     }
 
 }

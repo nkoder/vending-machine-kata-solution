@@ -16,7 +16,7 @@ public class Display {
         message = "Wybierz produkt";
     }
 
-    public void informAboutNoChangeAndPromptForProductChoice() {
+    public void warnAboutNoChange() {
         message = "Nie mogę wydać reszty. Zakup anulowany.";
     }
 
