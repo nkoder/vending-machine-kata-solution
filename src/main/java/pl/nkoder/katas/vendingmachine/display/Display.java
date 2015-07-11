@@ -13,10 +13,14 @@ public class Display {
     }
 
     public void promptForProductChoice() {
-        message = "Choose a product";
+        message = "Wybierz produkt";
+    }
+
+    public void informAboutNoChangeAndPromptForProductChoice() {
+        message = "Nie mogę wydać reszty. Zakup anulowany.";
     }
 
     public void promptForMoneyToInsert(Cost cost) {
-        message = format("Insert %s", cost.asText());
+        message = format("Wrzuć %s", cost.asText());
     }
 }

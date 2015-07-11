@@ -26,6 +26,18 @@ public class Cost {
         return value.equals(anotherCost.value);
     }
 
+    public boolean isLessThan(Cost anotherCost) {
+        return value.compareTo(anotherCost.value) < 0;
+    }
+
+    public boolean isGreaterThan(Cost anotherCost) {
+        return value.compareTo(anotherCost.value) > 0;
+    }
+
+    public boolean isEqualOrGreaterThan(Cost anotherCost) {
+        return isEqualTo(anotherCost) || isGreaterThan(anotherCost);
+    }
+
     public String asText() {
         return value.toString();
     }
