@@ -18,6 +18,7 @@ import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.MARS;
 
 public class VendingMachineShould {
 
+    private static final String CHOOSE_PRODUCT_PROMPT = "Choose a product";
     private static final int FIRST_SHELF = 1;
     private static final int SECOND_SHELF = 2;
 
@@ -27,7 +28,7 @@ public class VendingMachineShould {
 
         VendingMachine machine = new VendingMachine(new Shelves());
 
-        assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.displayedMessage()).isEqualTo(CHOOSE_PRODUCT_PROMPT);
         assertThat(machine.takeOutTray()).isEmpty();
         assertThat(machine.returnedCoins()).isEmpty();
     }
@@ -57,7 +58,7 @@ public class VendingMachineShould {
 
         machine.cancel();
 
-        assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.displayedMessage()).isEqualTo(CHOOSE_PRODUCT_PROMPT);
         assertThat(machine.takeOutTray()).isEmpty();
         assertThat(machine.returnedCoins()).isEmpty();
     }
@@ -114,12 +115,30 @@ public class VendingMachineShould {
 
         machine.cancel();
 
-        assertThat(machine.displayedMessage()).isEqualTo("Choose a product");
+        assertThat(machine.displayedMessage()).isEqualTo(CHOOSE_PRODUCT_PROMPT);
         assertThat(machine.takeOutTray()).isEmpty();
         assertThat(asMap(machine.returnedCoins()))
             .hasSize(2)
             .containsEntry(COIN_0_5, 3L)
             .containsEntry(COIN_1_0, 1L);
+    }
+
+    @Test
+    public void
+    sell_chosen_product_after_inserting_enough_coins() {
+
+        Shelves shelves = new Shelves().putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        VendingMachine machine = new VendingMachine(shelves);
+
+        machine.choose(FIRST_SHELF);
+
+        machine.insert(COIN_2_0);
+        machine.insert(COIN_1_0);
+        machine.insert(COIN_0_5);
+
+        assertThat(machine.displayedMessage()).isEqualTo(CHOOSE_PRODUCT_PROMPT);
+        assertThat(asMap(machine.takeOutTray())).hasSize(1).containsEntry(COLA, 1L);
+        assertThat(machine.returnedCoins()).isEmpty();
     }
 
     private <T> Map<T, Long> asMap(Iterable<T> coins) {
