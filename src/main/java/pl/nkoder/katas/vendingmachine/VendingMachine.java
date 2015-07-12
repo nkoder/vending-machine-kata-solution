@@ -1,6 +1,8 @@
 package pl.nkoder.katas.vendingmachine;
 
 import pl.nkoder.katas.vendingmachine.display.Display;
+import pl.nkoder.katas.vendingmachine.memory.InsertedValueMemory;
+import pl.nkoder.katas.vendingmachine.memory.ShelfChoiceMemory;
 import pl.nkoder.katas.vendingmachine.money.Coin;
 import pl.nkoder.katas.vendingmachine.money.Coins;
 import pl.nkoder.katas.vendingmachine.money.Cost;
@@ -22,9 +24,10 @@ public class VendingMachine {
     private final Display display = new Display();
     private final Tray<Product> takeOutTray = new Tray<>();
     private final Tray<Coin> returnedCoinsTray = new Tray<>();
-    private final Coins coinsForChosenProduct = new Coins();
+    private final Coins coins = new Coins();
+    private final InsertedValueMemory insertedValueMemory = new InsertedValueMemory();
+    private final ShelfChoiceMemory shelfChoiceMemory = new ShelfChoiceMemory();
 
-    private Optional<Integer> chosenShelfNumber = Optional.empty();
     private boolean lastTryWasSuccessful = true;
 
     public VendingMachine(Shelves shelves, DelayedActions delayedActions) {
@@ -38,33 +41,35 @@ public class VendingMachine {
     }
 
     public void choose(int shelfNumber) {
-        chosenShelfNumber = Optional.of(shelfNumber);
+        shelfChoiceMemory.setChosenShelfNumberTo(shelfNumber);
         updateDisplay();
     }
 
     public void insert(Coin coin) {
-        coinsForChosenProduct.add(coin);
+        insertedValueMemory.add(coin.value);
+        coins.add(coin);
         if (areEnoughCoinsInsertedToBuyChosenProduct()) {
-            Optional<List<Coin>> takenCoins =
-                coinsForChosenProduct.takeEquivalentOf(priceOfProductAtShelf(chosenShelfNumber).get());
-            if (takenCoins.isPresent()) {
-                takeOutTray.put(productAtShelf(chosenShelfNumber).get());
+            Cost change = insertedValueMemory.value().subtract(priceOfProductAtShelf(shelfChoiceMemory.chosenShelf()).get());
+            Optional<List<Coin>> changeCoins = coins.takeEquivalentOf(change);
+            if (changeCoins.isPresent()) {
+                takeOutTray.put(productAtShelf(shelfChoiceMemory.chosenShelf()).get());
+                changeCoins.get()
+                    .forEach(takenCoin -> returnedCoinsTray.put(takenCoin));
                 lastTryWasSuccessful = true;
             } else {
+                coins.takeEquivalentOf(insertedValueMemory.value()).get()
+                    .forEach(takenCoin -> returnedCoinsTray.put(takenCoin));
                 lastTryWasSuccessful = false;
             }
-            coinsForChosenProduct.takeAll()
-                .stream()
-                .forEach(takenCoin -> returnedCoinsTray.put(takenCoin));
-            chosenShelfNumber = Optional.empty();
+            insertedValueMemory.clear();
+            shelfChoiceMemory.clear();
         }
         updateDisplay();
     }
 
     public void cancel() {
-        chosenShelfNumber = Optional.empty();
-        coinsForChosenProduct.asList()
-            .stream()
+        shelfChoiceMemory.clear();
+        coins.takeEquivalentOf(insertedValueMemory.value()).get()
             .forEach(coin -> returnedCoinsTray.put(coin));
         updateDisplay();
     }
@@ -88,19 +93,19 @@ public class VendingMachine {
                     .perform(() -> display.promptForProductChoice());
             }
         } else {
-            Optional<Cost> optionalProductPrice = priceOfProductAtShelf(chosenShelfNumber);
-            Cost remainingCost = optionalProductPrice.get().subtract(coinsForChosenProduct.value());
+            Optional<Cost> optionalProductPrice = priceOfProductAtShelf(shelfChoiceMemory.chosenShelf());
+            Cost remainingCost = optionalProductPrice.get().subtract(insertedValueMemory.value());
             display.promptForMoneyToInsert(remainingCost);
         }
     }
 
     private boolean isProductChosen() {
-        return chosenShelfNumber.isPresent();
+        return shelfChoiceMemory.chosenShelf().isPresent();
     }
 
     private boolean areEnoughCoinsInsertedToBuyChosenProduct() {
-        return priceOfProductAtShelf(chosenShelfNumber)
-            .filter(price -> coinsForChosenProduct.value().isEqualOrGreaterThan(price))
+        return priceOfProductAtShelf(shelfChoiceMemory.chosenShelf())
+            .filter(price -> insertedValueMemory.value().isGreaterOrEqualTo(price))
             .isPresent();
     }
 
@@ -110,5 +115,11 @@ public class VendingMachine {
 
     private Optional<Product> productAtShelf(Optional<Integer> chosenShelfNumber) {
         return chosenShelfNumber.map(shelfNumber -> shelves.productAtShelf(shelfNumber));
+    }
+
+    public Iterable<Product> takeAllProductsFromTakeOutTray() {
+        Iterable<Product> products = takeOutTray.all();
+        takeOutTray.removeAll();
+        return products;
     }
 }

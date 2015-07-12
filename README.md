@@ -13,5 +13,5 @@ VendingMachineKata
 - [x] Jeżeli wybierzemy numer półki i wrzucimy kwotę nie mniejszą, niż cena produktu, to otrzymujemy produkt oraz resztę (pod warunkiem, że automat ma z czego tę resztę wydać).
 - [x] Jeżeli wybierzemy numer półki i wrzucimy kwotę mniejszą, niż cena produktu, to musimy wcisnąć “Anuluj”, aby otrzymać pieniądze z powrotem.
 - [x] Jeżeli maszyna nie może wydać reszty, wyświetla komunikat informujący o tym oraz zwraca wrzucone monety, nie wydając produktu.
-- [ ] Przy wydawaniu reszty maszyna może korzystać tylko z monet, które posiada z poprzednich zakupów (nie drukujemy pieniędzy ;-) )
+- [x] Przy wydawaniu reszty maszyna może korzystać tylko z monet, które posiada z poprzednich zakupów (nie drukujemy pieniędzy ;-) )
 

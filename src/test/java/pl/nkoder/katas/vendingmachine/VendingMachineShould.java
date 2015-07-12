@@ -192,4 +192,58 @@ public class VendingMachineShould {
         assertThat(machine).displaysMessage("Wybierz produkt");
     }
 
+    @Test
+    public void
+    consider_coins_from_previous_transactions_when_trying_to_give_the_change() {
+
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        VendingMachine machine = new VendingMachine(shelves, delayedActions);
+
+        machine.choose(FIRST_SHELF);
+
+        machine.insert(COIN_2_0);
+        machine.insert(COIN_1_0);
+        machine.insert(COIN_0_5);
+
+        machine.takeAllProductsFromTakeOutTray();
+
+        machine.choose(FIRST_SHELF);
+
+        machine.insert(COIN_2_0);
+        machine.insert(COIN_1_0);
+        machine.insert(COIN_1_0);
+
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasInTakeAwayTray(COLA)
+            .returnedCoins(COIN_0_5);
+    }
+
+    @Test
+    public void
+    return_only_coins_for_current_transaction_on_cancellation() {
+
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        VendingMachine machine = new VendingMachine(shelves, delayedActions);
+
+        machine.choose(FIRST_SHELF);
+
+        machine.insert(COIN_2_0);
+        machine.insert(COIN_1_0);
+        machine.insert(COIN_0_5);
+
+        machine.takeAllProductsFromTakeOutTray();
+
+        machine.choose(FIRST_SHELF);
+
+        machine.insert(COIN_2_0);
+
+        machine.cancel();
+
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .hasNoProductInTakeOutTray()
+            .returnedCoins(COIN_2_0);
+    }
+
 }

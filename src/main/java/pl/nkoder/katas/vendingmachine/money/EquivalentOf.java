@@ -3,8 +3,6 @@ package pl.nkoder.katas.vendingmachine.money;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 public class EquivalentOf {
 
     private final Cost cost;
@@ -14,11 +12,11 @@ public class EquivalentOf {
     }
 
     public Optional<Coins> using(Coins coins) {
+        if (cost.isEqualTo(Cost.costOf("0"))) {
+            return Optional.of(new Coins());
+        }
         for (Coin coin : coins.asList()) {
-            if (cost.isEqualTo(coin.value)) {
-                return Optional.of(new Coins(newArrayList(coin)));
-            }
-            if (cost.isGreaterThan(coin.value)) {
+            if (cost.isGreaterOrEqualTo(coin.value)) {
                 Coins restOfCoins = subtract(coins, coin);
                 Cost restOfCost = cost.subtract(coin.value);
                 Optional<Coins> restOfEquivalent = new EquivalentOf(restOfCost).using(restOfCoins);

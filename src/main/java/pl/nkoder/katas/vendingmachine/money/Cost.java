@@ -23,7 +23,7 @@ public class Cost {
     }
 
     public boolean isEqualTo(Cost anotherCost) {
-        return value.equals(anotherCost.value);
+        return value.compareTo(anotherCost.value) == 0;
     }
 
     public boolean isLessThan(Cost anotherCost) {
@@ -34,7 +34,7 @@ public class Cost {
         return value.compareTo(anotherCost.value) > 0;
     }
 
-    public boolean isEqualOrGreaterThan(Cost anotherCost) {
+    public boolean isGreaterOrEqualTo(Cost anotherCost) {
         return isEqualTo(anotherCost) || isGreaterThan(anotherCost);
     }
 
