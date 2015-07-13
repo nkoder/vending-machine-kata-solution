@@ -28,7 +28,7 @@ public class VendingMachineAssert extends AbstractAssert<VendingMachineAssert, V
     }
 
     public VendingMachineAssert hasNoProductInTakeOutTray() {
-        assertThat(actual.takeOutTray())
+        assertThat(actual.productsInTakeOutTray())
             .as("Products in take-out tray")
             .isEmpty();
         return myself;
@@ -36,7 +36,7 @@ public class VendingMachineAssert extends AbstractAssert<VendingMachineAssert, V
 
     public VendingMachineAssert hasInTakeAwayTray(Product... expectedProducts) {
         compare(
-            actual.takeOutTray(),
+            actual.productsInTakeOutTray(),
             newArrayList(expectedProducts),
             () -> "Number of product types in take-out tray",
             product -> format("Number of products in take-out tray of type %s", product));

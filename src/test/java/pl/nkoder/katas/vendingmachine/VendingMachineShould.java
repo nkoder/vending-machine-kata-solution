@@ -6,9 +6,7 @@ import pl.nkoder.katas.vendingmachine.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.time.DelayedActionsForTests;
 
 import static pl.nkoder.katas.vendingmachine.VendingMachineAssertions.assertThat;
-import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_0_5;
-import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_1_0;
-import static pl.nkoder.katas.vendingmachine.money.Coin.COIN_2_0;
+import static pl.nkoder.katas.vendingmachine.money.Coin.*;
 import static pl.nkoder.katas.vendingmachine.money.Cost.costOf;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.COLA;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.MARS;
@@ -57,7 +55,7 @@ public class VendingMachineShould {
     public void
     ask_for_product_after_cancellation_of_previous_choice() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("1.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
@@ -134,13 +132,12 @@ public class VendingMachineShould {
     public void
     sell_chosen_product_after_inserting_enough_coins() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("1.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
 
-        machine.insert(COIN_2_0);
-        machine.insert(COIN_1_0);
+        machine.insert(COIN_0_5);
         machine.insert(COIN_0_5);
 
         assertThat(machine)
@@ -153,13 +150,11 @@ public class VendingMachineShould {
     public void
     return_change_after_selling_product_if_inserted_more_coins_than_needed() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("1.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
 
-        machine.insert(COIN_2_0);
-        machine.insert(COIN_0_5);
         machine.insert(COIN_0_5);
         machine.insert(COIN_1_0);
 
@@ -171,21 +166,20 @@ public class VendingMachineShould {
 
     @Test
     public void
-    return_all_coins_after_try_of_selling_product_if_cannot_give_the_change() {
+    return_all_coins_after_trial_of_selling_product_if_cannot_give_the_change() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("1.5"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
 
-        machine.insert(COIN_2_0);
         machine.insert(COIN_1_0);
         machine.insert(COIN_1_0);
 
         assertThat(machine)
             .displaysMessage("Nie mogę wydać reszty. Zakup anulowany.")
             .hasNoProductInTakeOutTray()
-            .returnedCoins(COIN_1_0, COIN_1_0, COIN_2_0);
+            .returnedCoins(COIN_1_0, COIN_1_0);
 
         delayedActions.performAll();
 
@@ -196,54 +190,43 @@ public class VendingMachineShould {
     public void
     consider_coins_from_previous_transactions_when_trying_to_give_the_change() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("1.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
-
-        machine.insert(COIN_2_0);
         machine.insert(COIN_1_0);
-        machine.insert(COIN_0_5);
-
         machine.takeAllProductsFromTakeOutTray();
 
         machine.choose(FIRST_SHELF);
 
         machine.insert(COIN_2_0);
-        machine.insert(COIN_1_0);
-        machine.insert(COIN_1_0);
 
         assertThat(machine)
             .displaysMessage("Wybierz produkt")
             .hasInTakeAwayTray(COLA)
-            .returnedCoins(COIN_0_5);
+            .returnedCoins(COIN_1_0);
     }
 
     @Test
     public void
     return_only_coins_for_current_transaction_on_cancellation() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("2.0"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
-
         machine.insert(COIN_2_0);
-        machine.insert(COIN_1_0);
-        machine.insert(COIN_0_5);
-
         machine.takeAllProductsFromTakeOutTray();
 
         machine.choose(FIRST_SHELF);
 
-        machine.insert(COIN_2_0);
+        machine.insert(COIN_1_0);
 
         machine.cancel();
 
         assertThat(machine)
             .displaysMessage("Wybierz produkt")
             .hasNoProductInTakeOutTray()
-            .returnedCoins(COIN_2_0);
+            .returnedCoins(COIN_1_0);
     }
-
 }
