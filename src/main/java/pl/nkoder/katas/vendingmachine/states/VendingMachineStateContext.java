@@ -12,6 +12,7 @@ import pl.nkoder.katas.vendingmachine.tray.Tray;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 public class VendingMachineStateContext {
 
@@ -31,6 +32,7 @@ public class VendingMachineStateContext {
         this.delayedActions = delayedActions;
         this.takeOutTray = takeOutTray;
         this.returnedCoinsTray = returnedCoinsTray;
+        changeStateTo(new WaitingForShelfChoiceState(this));
     }
 
     public VendingMachineState currentState() {
@@ -50,8 +52,12 @@ public class VendingMachineStateContext {
         return shelves.productAtShelf(shelfNumber);
     }
 
-    public Coins allCoins() {
-        return allCoins;
+    public void addCoin(Coin coin) {
+        allCoins.add(coin);
+    }
+
+    public Optional<List<Coin>> takeCoinsOfValueOf(Cost cost) {
+        return allCoins.takeEquivalentOf(cost);
     }
 
     public void sellProductAtShelf(int shelfNumber) {

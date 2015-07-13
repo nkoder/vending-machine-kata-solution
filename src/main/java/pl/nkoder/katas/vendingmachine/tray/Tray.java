@@ -12,8 +12,14 @@ public class Tray<T> {
         things.add(thing);
     }
 
-    public Iterable<T> all() {
+    public Iterable<T> listAll() {
         return things;
+    }
+
+    public Iterable<T> takeAll() {
+        Iterable<T> result = newArrayList(things);
+        things.clear();
+        return result;
     }
 
     public void removeAll() {

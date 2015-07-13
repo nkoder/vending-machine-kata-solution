@@ -5,8 +5,8 @@ import pl.nkoder.katas.vendingmachine.money.Coin;
 import pl.nkoder.katas.vendingmachine.money.Coins;
 import pl.nkoder.katas.vendingmachine.products.Product;
 import pl.nkoder.katas.vendingmachine.shelves.Shelves;
+import pl.nkoder.katas.vendingmachine.states.VendingMachineState;
 import pl.nkoder.katas.vendingmachine.states.VendingMachineStateContext;
-import pl.nkoder.katas.vendingmachine.states.WaitingForShelfChoiceState;
 import pl.nkoder.katas.vendingmachine.time.DelayedActions;
 import pl.nkoder.katas.vendingmachine.tray.Tray;
 
@@ -19,8 +19,8 @@ public class VendingMachine {
 
     public VendingMachine(Shelves shelves, DelayedActions delayedActions) {
         Coins coins = new Coins();
-        this.stateContext = new VendingMachineStateContext(shelves, display, coins, delayedActions, takeOutTray, returnedCoinsTray);
-        stateContext.changeStateTo(new WaitingForShelfChoiceState(stateContext));
+        stateContext = new VendingMachineStateContext(
+            shelves, display, coins, delayedActions, takeOutTray, returnedCoinsTray); // TODO group sth?
     }
 
     public String displayedMessage() {
@@ -28,36 +28,31 @@ public class VendingMachine {
     }
 
     public void choose(int shelfNumber) {
-        stateContext.currentState().handleChoiceOfShelfNumber(shelfNumber);
-        updateDisplay();
+        currentState().handleChoiceOfShelfNumber(shelfNumber);
     }
 
     public void insert(Coin coin) {
-        stateContext.currentState().handleCoinInsertion(coin);
-        updateDisplay();
+        currentState().handleCoinInsertion(coin);
     }
 
     public void cancel() {
-        stateContext.currentState().handleCancellation();
-        updateDisplay();
+        currentState().handleCancellation();
     }
 
     public Iterable<Coin> returnedCoins() {
-        return returnedCoinsTray.all();
+        return returnedCoinsTray.listAll();
     }
 
     public Iterable<Product> productsInTakeOutTray() {
-        return takeOutTray.all();
+        return takeOutTray.listAll();
     }
 
     public Iterable<Product> takeAllProductsFromTakeOutTray() {
-        Iterable<Product> products = takeOutTray.all();
-        takeOutTray.removeAll();
-        return products;
+        return takeOutTray.takeAll();
     }
 
-    private void updateDisplay() {
-        stateContext.currentState().handleUpdateOf(display);
+    private VendingMachineState currentState() {
+        return stateContext.currentState();
     }
 
 }

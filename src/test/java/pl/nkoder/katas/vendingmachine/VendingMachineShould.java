@@ -110,12 +110,11 @@ public class VendingMachineShould {
     public void
     return_inserted_coins_on_cancellation() {
 
-        shelves.putProduct(COLA, FIRST_SHELF, costOf("3.5"));
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("2.5"));
         VendingMachine machine = new VendingMachine(shelves, delayedActions);
 
         machine.choose(FIRST_SHELF);
 
-        machine.insert(COIN_0_5);
         machine.insert(COIN_0_5);
         machine.insert(COIN_1_0);
         machine.insert(COIN_0_5);
@@ -125,7 +124,7 @@ public class VendingMachineShould {
         assertThat(machine)
             .displaysMessage("Wybierz produkt")
             .hasNoProductInTakeOutTray()
-            .returnedCoins(COIN_0_5, COIN_0_5, COIN_0_5, COIN_1_0);
+            .returnedCoins(COIN_0_5, COIN_0_5, COIN_1_0);
     }
 
     @Test

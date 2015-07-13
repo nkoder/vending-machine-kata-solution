@@ -13,12 +13,16 @@ public class InsertingCoinsState implements VendingMachineState {
 
     private final VendingMachineStateContext context;
     private final int chosenShelfNumber;
-
-    private Cost insertedValue = costOf("0");
+    private final Cost insertedCoinsValue;
 
     public InsertingCoinsState(int chosenShelfNumber, VendingMachineStateContext context) {
-        this.chosenShelfNumber = chosenShelfNumber;
+        this(costOf("0"), chosenShelfNumber, context);
+    }
+
+    private InsertingCoinsState(Cost insertedCoinsValue, int chosenShelfNumber, VendingMachineStateContext context) {
         this.context = context;
+        this.insertedCoinsValue = insertedCoinsValue;
+        this.chosenShelfNumber = chosenShelfNumber;
     }
 
     @Override
@@ -28,26 +32,31 @@ public class InsertingCoinsState implements VendingMachineState {
 
     @Override
     public void handleCoinInsertion(Coin coin) {
-        insertedValue = insertedValue.add(coin.value);
-        context.allCoins().add(coin);
-        if (areEnoughCoinsInsertedToBuyChosenProduct()) {
-            Cost change = insertedValue.subtract(context.priceOfProductAtShelf(chosenShelfNumber));
-            Optional<List<Coin>> changeCoins = context.allCoins().takeEquivalentOf(change);
+        context.addCoin(coin);
+        Cost newInsertedValue = insertedCoinsValue.add(coin.value);
+        Cost productPrice = context.priceOfProductAtShelf(chosenShelfNumber);
+        VendingMachineState nextState;
+        if (!newInsertedValue.isGreaterOrEqualTo(productPrice)) {
+            nextState = new InsertingCoinsState(newInsertedValue, chosenShelfNumber, context);
+        } else {
+            Cost change = newInsertedValue.subtract(productPrice);
+            Optional<List<Coin>> changeCoins = context.takeCoinsOfValueOf(change);
             if (changeCoins.isPresent()) {
                 context.sellProductAtShelf(chosenShelfNumber);
                 context.returnCoins(changeCoins.get());
-                context.changeStateTo(new WaitingForShelfChoiceState(context));
+                nextState = new WaitingForShelfChoiceState(context);
             } else {
-                Optional<List<Coin>> coins = context.allCoins().takeEquivalentOf(insertedValue);
+                Optional<List<Coin>> coins = context.takeCoinsOfValueOf(newInsertedValue);
                 context.returnCoins(coins.get());
-                context.changeStateTo(new UnableToReturnChangeState(context));
+                nextState = new UnableToReturnChangeState(context);
             }
         }
+        context.changeStateTo(nextState);
     }
 
     @Override
     public void handleCancellation() {
-        List<Coin> coinsToReturn = context.allCoins().takeEquivalentOf(insertedValue).get();
+        List<Coin> coinsToReturn = context.takeCoinsOfValueOf(insertedCoinsValue).get();
         context.returnCoins(coinsToReturn);
         context.changeStateTo(new WaitingForShelfChoiceState(context));
     }
@@ -55,13 +64,8 @@ public class InsertingCoinsState implements VendingMachineState {
     @Override
     public void handleUpdateOf(Display display) {
         Cost productPrice = context.priceOfProductAtShelf(chosenShelfNumber);
-        Cost remainingCost = productPrice.subtract(insertedValue);
+        Cost remainingCost = productPrice.subtract(insertedCoinsValue);
         display.promptForMoneyToInsert(remainingCost);
-    }
-
-    private boolean areEnoughCoinsInsertedToBuyChosenProduct() {
-        Cost price = context.priceOfProductAtShelf(chosenShelfNumber);
-        return insertedValue.isGreaterOrEqualTo(price);
     }
 
 }
