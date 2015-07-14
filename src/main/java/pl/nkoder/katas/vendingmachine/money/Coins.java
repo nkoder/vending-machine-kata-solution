@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static pl.nkoder.katas.vendingmachine.money.Cost.costOf;
 
 public class Coins {
 
@@ -22,13 +21,6 @@ public class Coins {
         listOfCoins.add(coin);
     }
 
-    public Cost value() {
-        return listOfCoins
-            .stream()
-            .map(coin -> coin.value)
-            .reduce(costOf("0"), Cost::add);
-    }
-
     public Optional<List<Coin>> takeEquivalentOf(Cost cost) {
         Optional<Coins> optionalCoins = new EquivalentOf(cost).using(this);
         if (optionalCoins.isPresent()) {
@@ -39,12 +31,6 @@ public class Coins {
         } else {
             return Optional.empty();
         }
-    }
-
-    public List<Coin> takeAll() {
-        List<Coin> coinsToBeTaken = asList();
-        listOfCoins.clear();
-        return coinsToBeTaken;
     }
 
     public List<Coin> asList() {

@@ -5,12 +5,16 @@ import pl.nkoder.katas.vendingmachine.money.Coin;
 
 public interface VendingMachineState {
 
-    void handleChoiceOfShelfNumber(int shelfNumber);
+    default void handleChoiceOfShelfNumber(int shelfNumber) {
+    }
 
-    void handleCoinInsertion(Coin coin);
+    default void handleCoinInsertion(Coin coin) {
+    }
 
-    void handleCancellation();
+    default void handleCancellation() {
+    }
 
-    void handleUpdateOf(Display display);
+    default void handleUpdateOf(Display display) {
+    }
 
 }

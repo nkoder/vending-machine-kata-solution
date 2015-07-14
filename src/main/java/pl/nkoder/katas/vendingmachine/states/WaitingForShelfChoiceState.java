@@ -3,6 +3,8 @@ package pl.nkoder.katas.vendingmachine.states;
 import pl.nkoder.katas.vendingmachine.display.Display;
 import pl.nkoder.katas.vendingmachine.money.Coin;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 public class WaitingForShelfChoiceState implements VendingMachineState {
 
     private final VendingMachineStateContext context;
@@ -18,12 +20,7 @@ public class WaitingForShelfChoiceState implements VendingMachineState {
 
     @Override
     public void handleCoinInsertion(Coin coin) {
-        // TODO
-    }
-
-    @Override
-    public void handleCancellation() {
-        // do nothing
+        context.returnCoins(newArrayList(coin));
     }
 
     @Override

@@ -43,6 +43,10 @@ public class VendingMachine {
         return returnedCoinsTray.listAll();
     }
 
+    public Iterable<Coin> takeAllReturnedCoins() {
+        return returnedCoinsTray.takeAll();
+    }
+
     public Iterable<Product> productsInTakeOutTray() {
         return takeOutTray.listAll();
     }
@@ -54,5 +58,4 @@ public class VendingMachine {
     private VendingMachineState currentState() {
         return stateContext.currentState();
     }
-
 }

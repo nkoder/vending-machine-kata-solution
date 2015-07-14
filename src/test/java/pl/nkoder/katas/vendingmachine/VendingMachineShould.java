@@ -228,4 +228,36 @@ public class VendingMachineShould {
             .hasNoProductInTakeOutTray()
             .returnedCoins(COIN_1_0);
     }
+
+    @Test
+    public void
+    return_coin_inserted_when_no_product_chosen() {
+
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("0.5"));
+        VendingMachine machine = new VendingMachine(shelves, delayedActions);
+
+        machine.insert(COIN_0_5);
+
+        assertThat(machine)
+            .displaysMessage("Wybierz produkt")
+            .returnedCoins(COIN_0_5);
+    }
+
+    @Test
+    public void
+    return_coin_inserted_while_displaying_info_about_no_possibility_to_sell_chosen_product() {
+
+        shelves.putProduct(COLA, FIRST_SHELF, costOf("0.5"));
+        VendingMachine machine = new VendingMachine(shelves, delayedActions);
+
+        machine.choose(FIRST_SHELF);
+        machine.insert(COIN_1_0);
+        machine.takeAllReturnedCoins();
+
+        machine.insert(COIN_0_5);
+
+        assertThat(machine)
+            .displaysMessage("Nie mogę wydać reszty. Zakup anulowany.")
+            .returnedCoins(COIN_0_5);
+    }
 }

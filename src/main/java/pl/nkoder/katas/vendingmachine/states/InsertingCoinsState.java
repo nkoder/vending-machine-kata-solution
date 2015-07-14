@@ -26,11 +26,6 @@ public class InsertingCoinsState implements VendingMachineState {
     }
 
     @Override
-    public void handleChoiceOfShelfNumber(int shelfNumber) {
-        // do nothing
-    }
-
-    @Override
     public void handleCoinInsertion(Coin coin) {
         context.addCoin(coin);
         Cost newInsertedValue = insertedCoinsValue.add(coin.value);
