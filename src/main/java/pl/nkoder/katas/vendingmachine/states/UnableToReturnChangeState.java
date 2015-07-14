@@ -1,7 +1,7 @@
 package pl.nkoder.katas.vendingmachine.states;
 
-import pl.nkoder.katas.vendingmachine.display.Display;
-import pl.nkoder.katas.vendingmachine.money.Coin;
+import pl.nkoder.katas.vendingmachine.parts.display.Display;
+import pl.nkoder.katas.vendingmachine.parts.money.Coin;
 
 import java.time.Duration;
 

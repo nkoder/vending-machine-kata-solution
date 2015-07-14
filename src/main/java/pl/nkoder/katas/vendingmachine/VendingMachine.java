@@ -1,10 +1,11 @@
 package pl.nkoder.katas.vendingmachine;
 
-import pl.nkoder.katas.vendingmachine.display.Display;
-import pl.nkoder.katas.vendingmachine.money.Coin;
-import pl.nkoder.katas.vendingmachine.money.Coins;
+import pl.nkoder.katas.vendingmachine.parts.Parts;
+import pl.nkoder.katas.vendingmachine.parts.display.Display;
+import pl.nkoder.katas.vendingmachine.parts.money.Coin;
+import pl.nkoder.katas.vendingmachine.parts.money.Coins;
+import pl.nkoder.katas.vendingmachine.parts.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.products.Product;
-import pl.nkoder.katas.vendingmachine.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.states.VendingMachineState;
 import pl.nkoder.katas.vendingmachine.states.VendingMachineStateContext;
 import pl.nkoder.katas.vendingmachine.time.DelayedActions;
@@ -19,8 +20,8 @@ public class VendingMachine {
 
     public VendingMachine(Shelves shelves, DelayedActions delayedActions) {
         Coins coins = new Coins();
-        stateContext = new VendingMachineStateContext(
-            shelves, display, coins, delayedActions, takeOutTray, returnedCoinsTray); // TODO group sth?
+        Parts parts = new Parts(shelves, display, takeOutTray, returnedCoinsTray);
+        stateContext = new VendingMachineStateContext(parts, coins, delayedActions);
     }
 
     public String displayedMessage() {

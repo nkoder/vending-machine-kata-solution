@@ -1,7 +1,8 @@
-package pl.nkoder.katas.vendingmachine.money;
+package pl.nkoder.katas.vendingmachine.parts.money;
 
-import static pl.nkoder.katas.vendingmachine.money.Cost.costOf;
+import static pl.nkoder.katas.vendingmachine.parts.money.Cost.costOf;
 
+@SuppressWarnings("unused")
 public enum Coin {
 
     COIN_0_1(costOf("0.1")),

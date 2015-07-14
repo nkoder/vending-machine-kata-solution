@@ -1,6 +1,6 @@
-package pl.nkoder.katas.vendingmachine.display;
+package pl.nkoder.katas.vendingmachine.parts.display;
 
-import pl.nkoder.katas.vendingmachine.money.Cost;
+import pl.nkoder.katas.vendingmachine.parts.money.Cost;
 
 import static java.lang.String.format;
 

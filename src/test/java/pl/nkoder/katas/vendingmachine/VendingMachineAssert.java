@@ -1,7 +1,7 @@
 package pl.nkoder.katas.vendingmachine;
 
 import org.assertj.core.api.AbstractAssert;
-import pl.nkoder.katas.vendingmachine.money.Coin;
+import pl.nkoder.katas.vendingmachine.parts.money.Coin;
 import pl.nkoder.katas.vendingmachine.products.Product;
 
 import java.util.Map;

@@ -1,13 +1,12 @@
 package pl.nkoder.katas.vendingmachine.states;
 
-import pl.nkoder.katas.vendingmachine.display.Display;
-import pl.nkoder.katas.vendingmachine.money.Coin;
-import pl.nkoder.katas.vendingmachine.money.Cost;
+import pl.nkoder.katas.vendingmachine.parts.display.Display;
+import pl.nkoder.katas.vendingmachine.parts.money.Coin;
+import pl.nkoder.katas.vendingmachine.parts.money.Cost;
 
 import java.util.List;
-import java.util.Optional;
 
-import static pl.nkoder.katas.vendingmachine.money.Cost.costOf;
+import static pl.nkoder.katas.vendingmachine.parts.money.Cost.costOf;
 
 public class InsertingCoinsState implements VendingMachineState {
 
@@ -29,36 +28,59 @@ public class InsertingCoinsState implements VendingMachineState {
     public void handleCoinInsertion(Coin coin) {
         context.addCoin(coin);
         Cost newInsertedValue = insertedCoinsValue.add(coin.value);
-        Cost productPrice = context.priceOfProductAtShelf(chosenShelfNumber);
         VendingMachineState nextState;
-        if (!newInsertedValue.isGreaterOrEqualTo(productPrice)) {
+        if (isNotEnoughToSellProduct(newInsertedValue)) {
             nextState = new InsertingCoinsState(newInsertedValue, chosenShelfNumber, context);
-        } else {
-            Cost change = newInsertedValue.subtract(productPrice);
-            Optional<List<Coin>> changeCoins = context.takeCoinsOfValueOf(change);
-            if (changeCoins.isPresent()) {
-                context.sellProductAtShelf(chosenShelfNumber);
-                context.returnCoins(changeCoins.get());
-                nextState = new WaitingForShelfChoiceState(context);
-            } else {
-                Optional<List<Coin>> coins = context.takeCoinsOfValueOf(newInsertedValue);
-                context.returnCoins(coins.get());
-                nextState = new UnableToReturnChangeState(context);
-            }
+            context.changeStateTo(nextState);
+            return;
         }
+        Cost change = changeToReturnWhenInsertedValueIs(newInsertedValue);
+        if (isPossibleToReturnCoinsOfValueOf(change)) {
+            sellProduct();
+            returnCoinsOfValueOf(change);
+            nextState = new WaitingForShelfChoiceState(context);
+            context.changeStateTo(nextState);
+            return;
+        }
+        returnCoinsOfValueOf(newInsertedValue);
+        nextState = new UnableToReturnChangeState(context);
         context.changeStateTo(nextState);
+    }
+
+    private boolean isNotEnoughToSellProduct(Cost newInsertedValue) {
+        return newInsertedValue.isLessThan(productPrice());
+    }
+
+    private Cost changeToReturnWhenInsertedValueIs(Cost newInsertedValue) {
+        return newInsertedValue.subtract(productPrice());
+    }
+
+    private boolean isPossibleToReturnCoinsOfValueOf(Cost change) {
+        return context.hasAvailableCoinsOfValueOf(change);
+    }
+
+    private Cost productPrice() {
+        return context.priceOfProductAtShelf(chosenShelfNumber);
     }
 
     @Override
     public void handleCancellation() {
-        List<Coin> coinsToReturn = context.takeCoinsOfValueOf(insertedCoinsValue).get();
-        context.returnCoins(coinsToReturn);
+        returnCoinsOfValueOf(insertedCoinsValue);
         context.changeStateTo(new WaitingForShelfChoiceState(context));
+    }
+
+    private void returnCoinsOfValueOf(Cost cost) {
+        List<Coin> changeCoins = context.takeCoinsOfValueOf(cost);
+        context.returnCoins(changeCoins);
+    }
+
+    private void sellProduct() {
+        context.sellProductAtShelf(chosenShelfNumber);
     }
 
     @Override
     public void handleUpdateOf(Display display) {
-        Cost productPrice = context.priceOfProductAtShelf(chosenShelfNumber);
+        Cost productPrice = productPrice();
         Cost remainingCost = productPrice.subtract(insertedCoinsValue);
         display.promptForMoneyToInsert(remainingCost);
     }

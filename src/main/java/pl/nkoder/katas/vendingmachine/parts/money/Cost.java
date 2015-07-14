@@ -1,4 +1,4 @@
-package pl.nkoder.katas.vendingmachine.money;
+package pl.nkoder.katas.vendingmachine.parts.money;
 
 import java.math.BigDecimal;
 
@@ -28,14 +28,6 @@ public class Cost {
 
     public boolean isLessThan(Cost anotherCost) {
         return value.compareTo(anotherCost.value) < 0;
-    }
-
-    public boolean isGreaterThan(Cost anotherCost) {
-        return value.compareTo(anotherCost.value) > 0;
-    }
-
-    public boolean isGreaterOrEqualTo(Cost anotherCost) {
-        return isEqualTo(anotherCost) || isGreaterThan(anotherCost);
     }
 
     public String asText() {

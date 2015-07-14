@@ -2,12 +2,12 @@ package pl.nkoder.katas.vendingmachine;
 
 import org.junit.Before;
 import org.junit.Test;
-import pl.nkoder.katas.vendingmachine.shelves.Shelves;
+import pl.nkoder.katas.vendingmachine.parts.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.time.DelayedActionsForTests;
 
 import static pl.nkoder.katas.vendingmachine.VendingMachineAssertions.assertThat;
-import static pl.nkoder.katas.vendingmachine.money.Coin.*;
-import static pl.nkoder.katas.vendingmachine.money.Cost.costOf;
+import static pl.nkoder.katas.vendingmachine.parts.money.Coin.*;
+import static pl.nkoder.katas.vendingmachine.parts.money.Cost.costOf;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.COLA;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.MARS;
 
@@ -218,7 +218,6 @@ public class VendingMachineShould {
         machine.takeAllProductsFromTakeOutTray();
 
         machine.choose(FIRST_SHELF);
-
         machine.insert(COIN_1_0);
 
         machine.cancel();

@@ -1,6 +1,6 @@
-package pl.nkoder.katas.vendingmachine.shelves;
+package pl.nkoder.katas.vendingmachine.parts.shelves;
 
-import pl.nkoder.katas.vendingmachine.money.Cost;
+import pl.nkoder.katas.vendingmachine.parts.money.Cost;
 import pl.nkoder.katas.vendingmachine.products.Product;
 
 class Shelf {
