@@ -6,7 +6,10 @@ import pl.nkoder.katas.vendingmachine.parts.shelves.Shelves;
 import pl.nkoder.katas.vendingmachine.time.DelayedActionsForTests;
 
 import static pl.nkoder.katas.vendingmachine.VendingMachineAssertions.assertThat;
-import static pl.nkoder.katas.vendingmachine.parts.money.Coin.*;
+import static pl.nkoder.katas.vendingmachine.parts.money.Coin.COIN_0_2;
+import static pl.nkoder.katas.vendingmachine.parts.money.Coin.COIN_0_5;
+import static pl.nkoder.katas.vendingmachine.parts.money.Coin.COIN_1_0;
+import static pl.nkoder.katas.vendingmachine.parts.money.Coin.COIN_2_0;
 import static pl.nkoder.katas.vendingmachine.parts.money.Cost.costOf;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.COLA;
 import static pl.nkoder.katas.vendingmachine.products.ProductsForTests.MARS;
@@ -258,5 +261,31 @@ public class VendingMachineShould {
         assertThat(machine)
             .displaysMessage("Nie mogę wydać reszty. Zakup anulowany.")
             .returnedCoins(COIN_0_5);
+    }
+
+    @Test
+    public void
+    return_coins_with_use_of_algorithm_which_does_not_stop_after_being_unable_to_return_coins_starting_with_highest_coin() {
+        shelves
+            .putProduct(MARS, FIRST_SHELF, costOf("1.1"))
+            .putProduct(COLA, SECOND_SHELF, costOf("1.4"));
+        VendingMachine machine = new VendingMachine(shelves, delayedActions);
+
+        machine.choose(FIRST_SHELF);
+        machine.insert(COIN_0_5);
+        machine.insert(COIN_0_2);
+        machine.insert(COIN_0_2);
+        machine.insert(COIN_0_2);
+        machine.takeAllProductsFromTakeOutTray();
+
+        machine.choose(SECOND_SHELF);
+        machine.insert(COIN_2_0);
+
+        // Qhen using improper algorithm this case will make machine unable to return coins
+        // because first biggest available coin is 0.5 (then there is no coin to make reset 0.1)
+        // and we need to start returning from 0.2 (and then 0.2 and 0.2).
+        assertThat(machine)
+            .hasInTakeAwayTray(COLA)
+            .returnedCoins(COIN_0_2, COIN_0_2, COIN_0_2);
     }
 }
